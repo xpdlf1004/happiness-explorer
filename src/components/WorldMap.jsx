@@ -7,7 +7,6 @@ const WorldMap = ({ data, selectedYear, onCountryClick, usePersonalized = false 
   const [worldData, setWorldData] = useState(null);
   const [tooltip, setTooltip] = useState({ show: false, x: 0, y: 0, content: {} });
 
-  // Load world map data
   useEffect(() => {
     fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
       .then(response => response.json())
@@ -17,7 +16,6 @@ const WorldMap = ({ data, selectedYear, onCountryClick, usePersonalized = false 
       });
   }, []);
 
-  // Render map
   useEffect(() => {
     if (!worldData || !data || !svgRef.current) return;
 
@@ -32,13 +30,11 @@ const WorldMap = ({ data, selectedYear, onCountryClick, usePersonalized = false 
 
     const pathGenerator = d3.geoPath().projection(projection);
 
-    // Create color scale
     const scoreField = usePersonalized ? 'Personalized_Score' : 'Happiness_Score';
     const scores = data.filter(d => d.Year === selectedYear).map(d => d[scoreField]);
     const colorScale = d3.scaleSequential(d3.interpolateYlGnBu)
       .domain([Math.min(...scores), Math.max(...scores)]);
 
-    // Country name mapping (simplified for main countries)
     const countryNameMap = {
       'United States of America': 'USA',
       'United Kingdom': 'UK',
@@ -52,7 +48,6 @@ const WorldMap = ({ data, selectedYear, onCountryClick, usePersonalized = false 
       'Australia': 'Australia'
     };
 
-    // Draw countries
     const g = svg.append('g');
 
     g.selectAll('path')
@@ -82,7 +77,6 @@ const WorldMap = ({ data, selectedYear, onCountryClick, usePersonalized = false 
         );
 
         if (countryData) {
-          const rect = event.currentTarget.getBoundingClientRect();
           setTooltip({
             show: true,
             x: event.clientX,
@@ -101,14 +95,13 @@ const WorldMap = ({ data, selectedYear, onCountryClick, usePersonalized = false 
           .attr('stroke', '#fff')
           .attr('stroke-width', 0.5);
       })
-      .on('click', (event, d) => {
+      .on('click', (_, d) => {
         const countryName = countryNameMap[d.properties.name];
         if (countryName) {
           onCountryClick(countryName);
         }
       });
 
-    // Add zoom behavior
     const zoom = d3.zoom()
       .scaleExtent([1, 8])
       .on('zoom', (event) => {
@@ -131,6 +124,33 @@ const WorldMap = ({ data, selectedYear, onCountryClick, usePersonalized = false 
           background: '#f8f9fa'
         }}
       />
+
+      <div style={{
+        position: 'absolute',
+        bottom: '20px',
+        right: '20px',
+        background: 'rgba(255, 255, 255, 0.95)',
+        padding: '16px',
+        borderRadius: '8px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+        fontSize: '12px'
+      }}>
+        <div style={{ fontWeight: 'bold', marginBottom: '8px', color: '#333' }}>
+          Happiness Score
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{
+            width: '100px',
+            height: '10px',
+            background: 'linear-gradient(to right, #ffffcc, #a1dab4, #41b6c4, #2c7fb8, #253494)',
+            borderRadius: '2px'
+          }}></div>
+          <span style={{ fontSize: '10px', color: '#666' }}>Low → High</span>
+        </div>
+        <div style={{ marginTop: '12px', fontSize: '10px', color: '#999' }}>
+          🖱️ Click country • Scroll to zoom
+        </div>
+      </div>
 
       {tooltip.show && (
         <div

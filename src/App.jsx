@@ -1,6 +1,7 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import WorldMap from './components/WorldMap';
+import Globe3D from './components/Globe3D';
 import WeightControls from './components/WeightControls';
 import Timeline from './components/Timeline';
 import CountryDrawer from './components/CountryDrawer';
@@ -176,6 +177,23 @@ function App() {
               🗺️ Map
             </button>
             <button
+              onClick={() => setActiveView('globe')}
+              style={{
+                flex: 1,
+                padding: '10px 16px',
+                border: 'none',
+                borderRadius: '8px',
+                background: activeView === 'globe' ? '#2196f3' : '#f0f0f0',
+                color: activeView === 'globe' ? 'white' : '#666',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'all 0.2s'
+              }}
+            >
+              🌍 3D Globe
+            </button>
+            <button
               onClick={() => setActiveView('ranking')}
               style={{
                 flex: 1,
@@ -257,6 +275,24 @@ function App() {
                 style={{ width: '100%', height: '100%' }}
               >
                 <WorldMap
+                  data={processedData}
+                  selectedYear={selectedYear}
+                  onCountryClick={handleCountryClick}
+                  usePersonalized={usePersonalized}
+                />
+              </motion.div>
+            )}
+
+            {activeView === 'globe' && (
+              <motion.div
+                key="globe"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                style={{ width: '100%', height: '100%' }}
+              >
+                <Globe3D
                   data={processedData}
                   selectedYear={selectedYear}
                   onCountryClick={handleCountryClick}
