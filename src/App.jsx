@@ -7,6 +7,8 @@ import Timeline from './components/Timeline';
 import CountryDrawer from './components/CountryDrawer';
 import RankingTable from './components/RankingTable';
 import ScatterPlot from './components/ScatterPlot';
+import TrendsChart from './components/TrendsChart';
+import DistributionChart from './components/DistributionChart';
 import { loadCSVData, getUniqueYears } from './utils/dataLoader';
 import { DEFAULT_WEIGHTS, processDataWithWeights } from './utils/scoreCalculator';
 
@@ -345,9 +347,14 @@ function App() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}
+                style={{ width: '100%', height: '100%' }}
               >
-                Trends Chart - Coming Soon
+                <TrendsChart
+                  data={processedData}
+                  selectedYear={selectedYear}
+                  onCountryClick={handleCountryClick}
+                  usePersonalized={true}
+                />
               </motion.div>
             )}
 
@@ -358,9 +365,13 @@ function App() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}
+                style={{ width: '100%', height: '100%' }}
               >
-                Distribution Chart - Coming Soon
+                <DistributionChart
+                  data={processedData}
+                  selectedYear={selectedYear}
+                  usePersonalized={true}
+                />
               </motion.div>
             )}
           </AnimatePresence>

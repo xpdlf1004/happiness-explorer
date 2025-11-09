@@ -212,22 +212,6 @@ const CountryDrawer = ({ country, data, selectedYear, isOpen, onClose, usePerson
               </RadarChart>
             </ResponsiveContainer>
           </div>
-
-          <div style={{
-            marginTop: '24px',
-            padding: '16px',
-            background: '#f5f5f5',
-            borderRadius: '8px',
-            fontSize: '14px',
-            lineHeight: '1.6'
-          }}>
-            <p style={{ margin: '0 0 8px 0', fontWeight: 'bold' }}>
-              💡 Insight
-            </p>
-            <p style={{ margin: 0, color: '#666' }}>
-              This country's happiness profile shows how different factors contribute to overall well-being. Adjust the weight sliders to see how rankings change based on your priorities.
-            </p>
-          </div>
         </div>
       </div>
 
