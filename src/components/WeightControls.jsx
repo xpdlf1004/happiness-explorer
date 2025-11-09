@@ -40,55 +40,34 @@ const WeightControls = ({ weights, onWeightsChange }) => {
         <h3 style={{ fontSize: '14px', marginBottom: '12px', color: '#666' }}>
           Presets
         </h3>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <button
-            onClick={() => handlePresetClick('equal')}
-            style={{
-              padding: '8px 16px',
-              border: '1px solid #ddd',
-              borderRadius: '6px',
-              background: 'white',
-              cursor: 'pointer',
-              fontSize: '13px',
-              transition: 'all 0.2s'
-            }}
-            onMouseOver={e => e.currentTarget.style.background = '#f0f0f0'}
-            onMouseOut={e => e.currentTarget.style.background = 'white'}
-          >
-            Equal Weights
-          </button>
-          <button
-            onClick={() => handlePresetClick('freedom')}
-            style={{
-              padding: '8px 16px',
-              border: '1px solid #ddd',
-              borderRadius: '6px',
-              background: 'white',
-              cursor: 'pointer',
-              fontSize: '13px',
-              transition: 'all 0.2s'
-            }}
-            onMouseOver={e => e.currentTarget.style.background = '#f0f0f0'}
-            onMouseOut={e => e.currentTarget.style.background = 'white'}
-          >
-            Freedom-Heavy
-          </button>
-          <button
-            onClick={() => handlePresetClick('health')}
-            style={{
-              padding: '8px 16px',
-              border: '1px solid #ddd',
-              borderRadius: '6px',
-              background: 'white',
-              cursor: 'pointer',
-              fontSize: '13px',
-              transition: 'all 0.2s'
-            }}
-            onMouseOver={e => e.currentTarget.style.background = '#f0f0f0'}
-            onMouseOut={e => e.currentTarget.style.background = 'white'}
-          >
-            Health-Heavy
-          </button>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+          {[
+            { key: 'equal', label: 'Equal' },
+            { key: 'balanced', label: 'Balanced' },
+            { key: 'wealth', label: 'Wealth' },
+            { key: 'health', label: 'Health' },
+            { key: 'freedom', label: 'Freedom' },
+            { key: 'social', label: 'Social' },
+            { key: 'ethics', label: 'Ethics' }
+          ].map(preset => (
+            <button
+              key={preset.key}
+              onClick={() => handlePresetClick(preset.key)}
+              style={{
+                padding: '8px 12px',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                background: 'white',
+                cursor: 'pointer',
+                fontSize: '12px',
+                transition: 'all 0.2s'
+              }}
+              onMouseOver={e => e.currentTarget.style.background = '#f0f0f0'}
+              onMouseOut={e => e.currentTarget.style.background = 'white'}
+            >
+              {preset.label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -159,22 +138,6 @@ const WeightControls = ({ weights, onWeightsChange }) => {
             />
           </div>
         ))}
-      </div>
-
-      <div style={{
-        marginTop: '24px',
-        padding: '16px',
-        background: '#f5f5f5',
-        borderRadius: '8px',
-        fontSize: '13px',
-        lineHeight: '1.6'
-      }}>
-        <p style={{ margin: '0 0 8px 0', fontWeight: 'bold' }}>
-          💡 How it works
-        </p>
-        <p style={{ margin: 0, color: '#666' }}>
-          Adjust the sliders to reflect what matters most to you. The map and rankings will update in real-time to show how countries score based on your personal happiness criteria.
-        </p>
       </div>
     </div>
   );

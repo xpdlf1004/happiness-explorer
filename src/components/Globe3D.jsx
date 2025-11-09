@@ -1,15 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Sphere, GradientTexture } from '@react-three/drei';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, Sphere, GradientTexture, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import * as d3 from 'd3';
 import { feature } from 'topojson-client';
 
-function Globe({ data, selectedYear, onCountryClick, usePersonalized }) {
+function Globe({ data, selectedYear, usePersonalized }) {
   const meshRef = useRef();
   const [worldData, setWorldData] = useState(null);
-  const [hoveredCountry, setHoveredCountry] = useState(null);
-  const { camera, raycaster, gl } = useThree();
 
   useEffect(() => {
     fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
@@ -21,20 +19,17 @@ function Globe({ data, selectedYear, onCountryClick, usePersonalized }) {
   }, []);
 
   useFrame(() => {
-    if (meshRef.current && !hoveredCountry) {
-      meshRef.current.rotation.y += 0.001;
+    if (meshRef.current) {
+      meshRef.current.rotation.y += 0.002;
     }
   });
 
   const countryMeshes = useRef([]);
 
+  const [countryLabels, setCountryLabels] = useState([]);
+
   useEffect(() => {
     if (!worldData || !data) return;
-
-    countryMeshes.current.forEach(mesh => {
-      if (mesh.parent) mesh.parent.remove(mesh);
-    });
-    countryMeshes.current = [];
 
     const scoreField = usePersonalized ? 'Personalized_Score' : 'Happiness_Score';
     const scores = data.filter(d => d.Year === selectedYear).map(d => d[scoreField]);
@@ -60,6 +55,28 @@ function Globe({ data, selectedYear, onCountryClick, usePersonalized }) {
       'Spain': 'Spain'
     };
 
+    const countryCenters = {
+      'USA': [-95, 37],
+      'UK': [-3, 54],
+      'South Africa': [24, -29],
+      'China': [104, 35],
+      'India': [78, 20],
+      'Brazil': [-47, -14],
+      'France': [2, 46],
+      'Germany': [10, 51],
+      'Canada': [-106, 56],
+      'Australia': [133, -27],
+      'Japan': [138, 36],
+      'South Korea': [127, 37],
+      'Mexico': [-102, 23],
+      'Russia': [105, 61],
+      'Italy': [12, 42],
+      'Spain': [-4, 40]
+    };
+
+    const labels = [];
+    const meshes = [];
+
     worldData.features.forEach(feature => {
       const countryName = countryNameMap[feature.properties.name];
       if (!countryName) return;
@@ -74,50 +91,85 @@ function Globe({ data, selectedYear, onCountryClick, usePersonalized }) {
 
       if (feature.geometry.type === 'Polygon') {
         feature.geometry.coordinates.forEach(coords => {
-          createCountryShape(coords, color, countryName, countryData);
+          const points = coords.map(([lon, lat]) => {
+            const phi = (90 - lat) * (Math.PI / 180);
+            const theta = (lon + 180) * (Math.PI / 180);
+            const radius = 2.01;
+            return new THREE.Vector3(
+              -radius * Math.sin(phi) * Math.cos(theta),
+              radius * Math.cos(phi),
+              radius * Math.sin(phi) * Math.sin(theta)
+            );
+          });
+
+          if (points.length >= 3) {
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const material = new THREE.LineBasicMaterial({
+              color: color,
+              linewidth: 2,
+              transparent: true,
+              opacity: 0.8
+            });
+            const line = new THREE.Line(geometry, material);
+            meshes.push(line);
+          }
         });
       } else if (feature.geometry.type === 'MultiPolygon') {
         feature.geometry.coordinates.forEach(polygon => {
           polygon.forEach(coords => {
-            createCountryShape(coords, color, countryName, countryData);
+            const points = coords.map(([lon, lat]) => {
+              const phi = (90 - lat) * (Math.PI / 180);
+              const theta = (lon + 180) * (Math.PI / 180);
+              const radius = 2.01;
+              return new THREE.Vector3(
+                -radius * Math.sin(phi) * Math.cos(theta),
+                radius * Math.cos(phi),
+                radius * Math.sin(phi) * Math.sin(theta)
+              );
+            });
+
+            if (points.length >= 3) {
+              const geometry = new THREE.BufferGeometry().setFromPoints(points);
+              const material = new THREE.LineBasicMaterial({
+                color: color,
+                linewidth: 2,
+                transparent: true,
+                opacity: 0.8
+              });
+              const line = new THREE.Line(geometry, material);
+              meshes.push(line);
+            }
           });
         });
       }
+
+      const center = countryCenters[countryName];
+      if (center) {
+        const [lon, lat] = center;
+        const phi = (90 - lat) * (Math.PI / 180);
+        const theta = (lon + 180) * (Math.PI / 180);
+        const radius = 2.15;
+        const position = [
+          -radius * Math.sin(phi) * Math.cos(theta),
+          radius * Math.cos(phi),
+          radius * Math.sin(phi) * Math.sin(theta)
+        ];
+        labels.push({ name: countryName, position });
+      }
     });
 
-  }, [worldData, data, selectedYear, usePersonalized]);
-
-  const createCountryShape = (coordinates, color, countryName, countryData) => {
-    const points = coordinates.map(([lon, lat]) => {
-      const phi = (90 - lat) * (Math.PI / 180);
-      const theta = (lon + 180) * (Math.PI / 180);
-      const radius = 2.01;
-
-      return new THREE.Vector3(
-        -radius * Math.sin(phi) * Math.cos(theta),
-        radius * Math.cos(phi),
-        radius * Math.sin(phi) * Math.sin(theta)
-      );
+    countryMeshes.current.forEach(mesh => {
+      if (mesh.parent) mesh.parent.remove(mesh);
     });
-
-    if (points.length < 3) return;
-
-    const geometry = new THREE.BufferGeometry().setFromPoints(points);
-    const material = new THREE.LineBasicMaterial({
-      color: color,
-      linewidth: 2,
-      transparent: true,
-      opacity: 0.8
-    });
-
-    const line = new THREE.Line(geometry, material);
-    line.userData = { countryName, countryData };
+    countryMeshes.current = meshes;
 
     if (meshRef.current) {
-      meshRef.current.add(line);
-      countryMeshes.current.push(line);
+      meshes.forEach(mesh => meshRef.current.add(mesh));
     }
-  };
+
+    setCountryLabels(labels);
+
+  }, [worldData, data, selectedYear, usePersonalized]);
 
   return (
     <group ref={meshRef}>
@@ -143,13 +195,26 @@ function Globe({ data, selectedYear, onCountryClick, usePersonalized }) {
           side={THREE.BackSide}
         />
       </Sphere>
+
+      {countryLabels.map((label, index) => (
+        <Text
+          key={index}
+          position={label.position}
+          fontSize={0.08}
+          color="white"
+          anchorX="center"
+          anchorY="middle"
+          outlineWidth={0.01}
+          outlineColor="#000000"
+        >
+          {label.name}
+        </Text>
+      ))}
     </group>
   );
 }
 
-const Globe3D = ({ data, selectedYear, onCountryClick, usePersonalized = false }) => {
-  const [tooltip, setTooltip] = useState({ show: false, x: 0, y: 0, content: {} });
-
+const Globe3D = ({ data, selectedYear, usePersonalized = false }) => {
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', background: '#0a0a0a' }}>
       <Canvas
@@ -163,7 +228,6 @@ const Globe3D = ({ data, selectedYear, onCountryClick, usePersonalized = false }
         <Globe
           data={data}
           selectedYear={selectedYear}
-          onCountryClick={onCountryClick}
           usePersonalized={usePersonalized}
         />
 
@@ -203,36 +267,6 @@ const Globe3D = ({ data, selectedYear, onCountryClick, usePersonalized = false }
           🖱️ Drag to rotate • Scroll to zoom
         </div>
       </div>
-
-      {tooltip.show && (
-        <div
-          style={{
-            position: 'fixed',
-            left: tooltip.x + 10,
-            top: tooltip.y + 10,
-            background: 'rgba(0, 0, 0, 0.95)',
-            color: 'white',
-            padding: '12px 16px',
-            borderRadius: '8px',
-            pointerEvents: 'none',
-            zIndex: 1000,
-            fontSize: '14px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255,255,255,0.1)'
-          }}
-        >
-          <div style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '16px' }}>
-            {tooltip.content.Country}
-          </div>
-          <div style={{ marginBottom: '4px' }}>
-            <strong>Score:</strong> {tooltip.content.score?.toFixed(2)}
-          </div>
-          <div style={{ fontSize: '12px', color: '#aaa', marginTop: '8px' }}>
-            Click for details
-          </div>
-        </div>
-      )}
     </div>
   );
 };

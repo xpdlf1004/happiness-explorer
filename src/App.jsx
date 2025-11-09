@@ -17,8 +17,8 @@ function App() {
   const [selectedYear, setSelectedYear] = useState(2024);
   const [years, setYears] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState(null);
-  const [activeView, setActiveView] = useState('map');
-  const [usePersonalized, setUsePersonalized] = useState(false);
+  const [activeView, setActiveView] = useState('region');
+  const [mapView, setMapView] = useState('map');
   const [loading, setLoading] = useState(true);
 
   // Load data
@@ -47,7 +47,6 @@ function App() {
 
   const handleWeightsChange = useCallback((newWeights) => {
     setWeights(newWeights);
-    setUsePersonalized(true);
   }, []);
 
   const handleCountryClick = useCallback((country) => {
@@ -110,8 +109,8 @@ function App() {
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '320px 1fr 400px',
-        gridTemplateRows: 'auto 1fr',
+        gridTemplateColumns: '320px 1fr 350px',
+        gridTemplateRows: 'auto 1fr 1fr',
         gap: '16px',
         padding: '16px',
         height: 'calc(100vh - 90px)',
@@ -122,7 +121,7 @@ function App() {
           initial={{ x: -100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
-          style={{ gridRow: '1 / 3' }}
+          style={{ gridRow: '1 / 4' }}
         >
           <WeightControls
             weights={weights}
@@ -151,105 +150,85 @@ function App() {
           style={{
             background: 'white',
             borderRadius: '12px',
-            padding: '16px',
+            padding: '12px',
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             display: 'flex',
-            flexDirection: 'column',
-            gap: '12px'
+            gap: '6px',
+            flexWrap: 'wrap'
           }}
         >
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <button
-              onClick={() => setActiveView('map')}
-              style={{
-                flex: 1,
-                padding: '10px 16px',
-                border: 'none',
-                borderRadius: '8px',
-                background: activeView === 'map' ? '#2196f3' : '#f0f0f0',
-                color: activeView === 'map' ? 'white' : '#666',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '500',
-                transition: 'all 0.2s'
-              }}
-            >
-              🗺️ Map
-            </button>
-            <button
-              onClick={() => setActiveView('globe')}
-              style={{
-                flex: 1,
-                padding: '10px 16px',
-                border: 'none',
-                borderRadius: '8px',
-                background: activeView === 'globe' ? '#2196f3' : '#f0f0f0',
-                color: activeView === 'globe' ? 'white' : '#666',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '500',
-                transition: 'all 0.2s'
-              }}
-            >
-              🌍 3D Globe
-            </button>
-            <button
-              onClick={() => setActiveView('ranking')}
-              style={{
-                flex: 1,
-                padding: '10px 16px',
-                border: 'none',
-                borderRadius: '8px',
-                background: activeView === 'ranking' ? '#2196f3' : '#f0f0f0',
-                color: activeView === 'ranking' ? 'white' : '#666',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '500',
-                transition: 'all 0.2s'
-              }}
-            >
-              📊 Rankings
-            </button>
-            <button
-              onClick={() => setActiveView('scatter')}
-              style={{
-                flex: 1,
-                padding: '10px 16px',
-                border: 'none',
-                borderRadius: '8px',
-                background: activeView === 'scatter' ? '#2196f3' : '#f0f0f0',
-                color: activeView === 'scatter' ? 'white' : '#666',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '500',
-                transition: 'all 0.2s'
-              }}
-            >
-              📈 GDP vs Happiness
-            </button>
-          </div>
-
-          <div style={{
-            padding: '12px',
-            background: '#f8f9fa',
-            borderRadius: '8px'
-          }}>
-            <label style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
+          <button
+            onClick={() => setActiveView('region')}
+            style={{
+              flex: 1,
+              minWidth: '80px',
+              padding: '8px 12px',
+              border: 'none',
+              borderRadius: '6px',
+              background: activeView === 'region' ? '#2196f3' : '#f0f0f0',
+              color: activeView === 'region' ? 'white' : '#666',
               cursor: 'pointer',
-              fontSize: '14px'
-            }}>
-              <input
-                type="checkbox"
-                checked={usePersonalized}
-                onChange={(e) => setUsePersonalized(e.target.checked)}
-                style={{ cursor: 'pointer' }}
-              />
-              <span>Use Personalized Scores</span>
-            </label>
-          </div>
+              fontSize: '12px',
+              fontWeight: '500',
+              transition: 'all 0.2s'
+            }}
+          >
+            🗺️ Region
+          </button>
+          <button
+            onClick={() => setActiveView('scatter')}
+            style={{
+              flex: 1,
+              minWidth: '80px',
+              padding: '8px 12px',
+              border: 'none',
+              borderRadius: '6px',
+              background: activeView === 'scatter' ? '#2196f3' : '#f0f0f0',
+              color: activeView === 'scatter' ? 'white' : '#666',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontWeight: '500',
+              transition: 'all 0.2s'
+            }}
+          >
+            📊 Scatter
+          </button>
+          <button
+            onClick={() => setActiveView('trends')}
+            style={{
+              flex: 1,
+              minWidth: '80px',
+              padding: '8px 12px',
+              border: 'none',
+              borderRadius: '6px',
+              background: activeView === 'trends' ? '#2196f3' : '#f0f0f0',
+              color: activeView === 'trends' ? 'white' : '#666',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontWeight: '500',
+              transition: 'all 0.2s'
+            }}
+          >
+            📈 Trends
+          </button>
+          <button
+            onClick={() => setActiveView('distribution')}
+            style={{
+              flex: 1,
+              minWidth: '80px',
+              padding: '8px 12px',
+              border: 'none',
+              borderRadius: '6px',
+              background: activeView === 'distribution' ? '#2196f3' : '#f0f0f0',
+              color: activeView === 'distribution' ? 'white' : '#666',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontWeight: '500',
+              transition: 'all 0.2s'
+            }}
+          >
+            📊 Distribution
+          </button>
         </motion.div>
 
         {/* Main View - Center */}
@@ -261,61 +240,83 @@ function App() {
             background: 'white',
             borderRadius: '12px',
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            position: 'relative',
+            gridRow: '2 / 4'
           }}
         >
           <AnimatePresence mode="wait">
-            {activeView === 'map' && (
+            {activeView === 'region' && (
               <motion.div
-                key="map"
+                key="region"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                style={{ width: '100%', height: '100%' }}
+                style={{ width: '100%', height: '100%', position: 'relative' }}
               >
-                <WorldMap
-                  data={processedData}
-                  selectedYear={selectedYear}
-                  onCountryClick={handleCountryClick}
-                  usePersonalized={usePersonalized}
-                />
-              </motion.div>
-            )}
+                {/* 2D/3D Toggle inside map view */}
+                <div style={{
+                  position: 'absolute',
+                  top: '16px',
+                  right: '16px',
+                  zIndex: 10,
+                  background: 'rgba(255, 255, 255, 0.95)',
+                  borderRadius: '8px',
+                  padding: '6px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                  display: 'flex',
+                  gap: '6px'
+                }}>
+                  <button
+                    onClick={() => setMapView('map')}
+                    style={{
+                      padding: '6px 12px',
+                      border: 'none',
+                      borderRadius: '4px',
+                      background: mapView === 'map' ? '#2196f3' : '#f0f0f0',
+                      color: mapView === 'map' ? 'white' : '#666',
+                      cursor: 'pointer',
+                      fontSize: '11px',
+                      fontWeight: '500',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    2D
+                  </button>
+                  <button
+                    onClick={() => setMapView('globe')}
+                    style={{
+                      padding: '6px 12px',
+                      border: 'none',
+                      borderRadius: '4px',
+                      background: mapView === 'globe' ? '#2196f3' : '#f0f0f0',
+                      color: mapView === 'globe' ? 'white' : '#666',
+                      cursor: 'pointer',
+                      fontSize: '11px',
+                      fontWeight: '500',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    3D
+                  </button>
+                </div>
 
-            {activeView === 'globe' && (
-              <motion.div
-                key="globe"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                style={{ width: '100%', height: '100%' }}
-              >
-                <Globe3D
-                  data={processedData}
-                  selectedYear={selectedYear}
-                  onCountryClick={handleCountryClick}
-                  usePersonalized={usePersonalized}
-                />
-              </motion.div>
-            )}
-
-            {activeView === 'ranking' && (
-              <motion.div
-                key="ranking"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                style={{ width: '100%', height: '100%' }}
-              >
-                <RankingTable
-                  data={processedData}
-                  selectedYear={selectedYear}
-                  onCountryClick={handleCountryClick}
-                  usePersonalized={usePersonalized}
-                />
+                {mapView === 'map' ? (
+                  <WorldMap
+                    data={processedData}
+                    selectedYear={selectedYear}
+                    onCountryClick={handleCountryClick}
+                    usePersonalized={true}
+                  />
+                ) : (
+                  <Globe3D
+                    data={processedData}
+                    selectedYear={selectedYear}
+                    onCountryClick={handleCountryClick}
+                    usePersonalized={true}
+                  />
+                )}
               </motion.div>
             )}
 
@@ -332,75 +333,52 @@ function App() {
                   data={processedData}
                   selectedYear={selectedYear}
                   onCountryClick={handleCountryClick}
-                  usePersonalized={usePersonalized}
+                  usePersonalized={true}
                 />
+              </motion.div>
+            )}
+
+            {activeView === 'trends' && (
+              <motion.div
+                key="trends"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}
+              >
+                Trends Chart - Coming Soon
+              </motion.div>
+            )}
+
+            {activeView === 'distribution' && (
+              <motion.div
+                key="distribution"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}
+              >
+                Distribution Chart - Coming Soon
               </motion.div>
             )}
           </AnimatePresence>
         </motion.div>
 
-        {/* Info Panel - Right Sidebar */}
+        {/* Rankings - Right Bottom */}
         <motion.div
           initial={{ x: 100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          style={{
-            background: 'white',
-            borderRadius: '12px',
-            padding: '24px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            overflowY: 'auto'
-          }}
+          transition={{ delay: 0.4 }}
+          style={{ gridRow: '2 / 4' }}
         >
-          <h3 style={{
-            margin: '0 0 16px 0',
-            fontSize: '18px',
-            fontWeight: 'bold'
-          }}>
-            About This Project
-          </h3>
-
-          <div style={{
-            fontSize: '14px',
-            lineHeight: '1.6',
-            color: '#666',
-            marginBottom: '20px'
-          }}>
-            <p style={{ margin: '0 0 12px 0' }}>
-              <strong>Core Insight:</strong> There is no universal definition of happiness. This interactive dashboard lets you redefine happiness based on your personal values.
-            </p>
-            <p style={{ margin: '0 0 12px 0' }}>
-              <strong>6 Happiness Factors:</strong> GDP per Capita, Social Support, Healthy Life Expectancy, Freedom, Generosity, and Corruption Perception.
-            </p>
-            <p style={{ margin: 0 }}>
-              Adjust the weight sliders to see how country rankings change based on what matters most to you.
-            </p>
-          </div>
-
-          <div style={{
-            padding: '16px',
-            background: '#f8f9fa',
-            borderRadius: '8px',
-            fontSize: '13px',
-            lineHeight: '1.6'
-          }}>
-            <h4 style={{
-              margin: '0 0 8px 0',
-              fontSize: '14px',
-              fontWeight: 'bold'
-            }}>
-              🎯 Key Questions
-            </h4>
-            <ul style={{
-              margin: 0,
-              paddingLeft: '20px',
-              color: '#666'
-            }}>
-              <li>How do rankings change with different value priorities?</li>
-              <li>Which countries achieve high happiness with moderate GDP?</li>
-              <li>How has global happiness evolved from 2005-2024?</li>
-            </ul>
-          </div>
+          <RankingTable
+            data={processedData}
+            selectedYear={selectedYear}
+            onCountryClick={handleCountryClick}
+            usePersonalized={true}
+          />
         </motion.div>
       </div>
 
@@ -411,7 +389,7 @@ function App() {
         selectedYear={selectedYear}
         isOpen={!!selectedCountry}
         onClose={handleCloseDrawer}
-        usePersonalized={usePersonalized}
+        usePersonalized={true}
       />
     </div>
   );

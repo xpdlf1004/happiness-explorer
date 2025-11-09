@@ -43,6 +43,38 @@ export const PRESETS = {
     Freedom: 10,
     Generosity: 10,
     Corruption_Perception: 10
+  },
+  wealth: {
+    GDP_per_Capita: 40,
+    Social_Support: 15,
+    Healthy_Life_Expectancy: 15,
+    Freedom: 10,
+    Generosity: 10,
+    Corruption_Perception: 10
+  },
+  social: {
+    GDP_per_Capita: 10,
+    Social_Support: 40,
+    Healthy_Life_Expectancy: 15,
+    Freedom: 15,
+    Generosity: 10,
+    Corruption_Perception: 10
+  },
+  ethics: {
+    GDP_per_Capita: 10,
+    Social_Support: 15,
+    Healthy_Life_Expectancy: 10,
+    Freedom: 15,
+    Generosity: 25,
+    Corruption_Perception: 25
+  },
+  balanced: {
+    GDP_per_Capita: 20,
+    Social_Support: 20,
+    Healthy_Life_Expectancy: 20,
+    Freedom: 20,
+    Generosity: 10,
+    Corruption_Perception: 10
   }
 };
 

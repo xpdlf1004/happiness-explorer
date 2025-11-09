@@ -1,22 +1,48 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 
+const FACTORS = [
+  { key: 'GDP_per_Capita', label: 'GDP per Capita', unit: '$' },
+  { key: 'Social_Support', label: 'Social Support', unit: '' },
+  { key: 'Healthy_Life_Expectancy', label: 'Life Expectancy', unit: 'years' },
+  { key: 'Freedom', label: 'Freedom', unit: '' },
+  { key: 'Generosity', label: 'Generosity', unit: '' },
+  { key: 'Corruption_Perception', label: 'Corruption Perception', unit: '' },
+  { key: 'Education_Index', label: 'Education Index', unit: '' },
+  { key: 'Mental_Health_Index', label: 'Mental Health Index', unit: '' },
+  { key: 'Work_Life_Balance', label: 'Work-Life Balance', unit: '' },
+  { key: 'Political_Stability', label: 'Political Stability', unit: '' },
+  { key: 'Internet_Access', label: 'Internet Access', unit: '%' },
+  { key: 'Public_Health_Expenditure', label: 'Health Expenditure', unit: '%' },
+  { key: 'Income_Inequality', label: 'Income Inequality', unit: '' },
+  { key: 'Crime_Rate', label: 'Crime Rate', unit: '' },
+  { key: 'Climate_Index', label: 'Climate Index', unit: '' }
+];
+
 const ScatterPlot = ({ data, selectedYear, onCountryClick, usePersonalized }) => {
+  const [selectedFactor, setSelectedFactor] = useState(FACTORS[0]);
+
   const plotData = useMemo(() => {
     const scoreField = usePersonalized ? 'Personalized_Score' : 'Happiness_Score';
     return data
       .filter(d => d.Year === selectedYear)
       .map(d => ({
         country: d.Country,
-        gdp: d.GDP_per_Capita,
+        factor: d[selectedFactor.key],
         happiness: d[scoreField],
         population: d.Population
       }));
-  }, [data, selectedYear, usePersonalized]);
+  }, [data, selectedYear, usePersonalized, selectedFactor]);
 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
+      const factorValue = selectedFactor.unit === '$'
+        ? `$${data.factor.toFixed(0)}`
+        : selectedFactor.unit
+        ? `${data.factor.toFixed(1)}${selectedFactor.unit}`
+        : data.factor.toFixed(2);
+
       return (
         <div style={{
           background: 'rgba(0, 0, 0, 0.9)',
@@ -29,7 +55,7 @@ const ScatterPlot = ({ data, selectedYear, onCountryClick, usePersonalized }) =>
             {data.country}
           </div>
           <div style={{ marginBottom: '4px' }}>
-            <strong>GDP per Capita:</strong> ${data.gdp.toFixed(0)}
+            <strong>{selectedFactor.label}:</strong> {factorValue}
           </div>
           <div style={{ marginBottom: '4px' }}>
             <strong>Happiness Score:</strong> {data.happiness.toFixed(2)}
@@ -54,19 +80,47 @@ const ScatterPlot = ({ data, selectedYear, onCountryClick, usePersonalized }) =>
       flexDirection: 'column'
     }}>
       <div style={{ marginBottom: '16px' }}>
-        <h2 style={{
-          margin: '0 0 4px 0',
-          fontSize: '20px',
-          fontWeight: 'bold'
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '8px'
         }}>
-          GDP vs Happiness ({selectedYear})
-        </h2>
+          <h2 style={{
+            margin: 0,
+            fontSize: '20px',
+            fontWeight: 'bold'
+          }}>
+            {selectedFactor.label} vs Happiness ({selectedYear})
+          </h2>
+          <select
+            value={selectedFactor.key}
+            onChange={(e) => {
+              const factor = FACTORS.find(f => f.key === e.target.value);
+              setSelectedFactor(factor);
+            }}
+            style={{
+              padding: '8px 12px',
+              borderRadius: '6px',
+              border: '1px solid #ddd',
+              fontSize: '13px',
+              cursor: 'pointer',
+              background: 'white'
+            }}
+          >
+            {FACTORS.map(factor => (
+              <option key={factor.key} value={factor.key}>
+                {factor.label}
+              </option>
+            ))}
+          </select>
+        </div>
         <p style={{
           margin: 0,
           fontSize: '14px',
           color: '#666'
         }}>
-          Exploring the relationship between economic prosperity and happiness
+          Exploring the relationship between {selectedFactor.label.toLowerCase()} and happiness
         </p>
       </div>
 
@@ -76,10 +130,10 @@ const ScatterPlot = ({ data, selectedYear, onCountryClick, usePersonalized }) =>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               type="number"
-              dataKey="gdp"
-              name="GDP per Capita"
+              dataKey="factor"
+              name={selectedFactor.label}
               label={{
-                value: 'GDP per Capita ($)',
+                value: `${selectedFactor.label} ${selectedFactor.unit ? `(${selectedFactor.unit})` : ''}`,
                 position: 'insideBottom',
                 offset: -10,
                 style: { fontSize: '14px' }
@@ -114,17 +168,6 @@ const ScatterPlot = ({ data, selectedYear, onCountryClick, usePersonalized }) =>
             />
           </ScatterChart>
         </ResponsiveContainer>
-      </div>
-
-      <div style={{
-        marginTop: '16px',
-        padding: '12px 16px',
-        background: '#f5f5f5',
-        borderRadius: '8px',
-        fontSize: '13px',
-        color: '#666'
-      }}>
-        <strong>💡 Insight:</strong> While GDP correlates with happiness, the relationship isn't perfectly linear. Some countries achieve high happiness with moderate GDP, while others with high GDP show lower happiness levels.
       </div>
     </div>
   );
