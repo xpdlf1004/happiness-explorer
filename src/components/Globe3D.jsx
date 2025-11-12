@@ -1,13 +1,55 @@
 import { useEffect, useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Sphere, GradientTexture, Text } from '@react-three/drei';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { OrbitControls, Sphere, GradientTexture, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import * as d3 from 'd3';
 import { feature } from 'topojson-client';
 
+function Label({ position, text, globeRotation }) {
+  const { camera } = useThree();
+  const [isVisible, setIsVisible] = useState(false);
+  const frameCount = useRef(0);
+
+  useFrame(() => {
+    frameCount.current++;
+    if (frameCount.current % 3 !== 0) return;
+
+    const labelPos = new THREE.Vector3(...position);
+    labelPos.applyAxisAngle(new THREE.Vector3(0, 1, 0), globeRotation);
+
+    const cameraPos = camera.position.clone().normalize();
+    const toLabelNorm = labelPos.clone().normalize();
+
+    const dot = toLabelNorm.dot(cameraPos);
+    setIsVisible(dot > 0.1);
+  });
+
+  if (!isVisible) return null;
+
+  return (
+    <Html
+      position={position}
+      center
+      style={{
+        color: 'white',
+        fontSize: '11px',
+        fontWeight: '600',
+        textShadow: '0 0 3px black, 0 0 6px black',
+        pointerEvents: 'none',
+        userSelect: 'none',
+        whiteSpace: 'nowrap',
+        opacity: 0.9
+      }}
+    >
+      {text}
+    </Html>
+  );
+}
+
 function Globe({ data, selectedYear, usePersonalized }) {
   const meshRef = useRef();
   const [worldData, setWorldData] = useState(null);
+  const [globeRotation, setGlobeRotation] = useState(0);
 
   useEffect(() => {
     fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
@@ -21,11 +63,11 @@ function Globe({ data, selectedYear, usePersonalized }) {
   useFrame(() => {
     if (meshRef.current) {
       meshRef.current.rotation.y += 0.002;
+      setGlobeRotation(meshRef.current.rotation.y);
     }
   });
 
   const countryMeshes = useRef([]);
-
   const [countryLabels, setCountryLabels] = useState([]);
 
   useEffect(() => {
@@ -36,7 +78,6 @@ function Globe({ data, selectedYear, usePersonalized }) {
     const colorScale = d3.scaleSequential(d3.interpolateYlGnBu)
       .domain([Math.min(...scores), Math.max(...scores)]);
 
-    // Comprehensive country name mapping from World Atlas to CSV data
     const countryNameMap = {
       'United States of America': 'United States',
       'United Kingdom': 'United Kingdom',
@@ -103,12 +144,10 @@ function Globe({ data, selectedYear, usePersonalized }) {
       'Iceland': 'Iceland'
     };
 
-    // Fallback: try direct name match if not in mapping
     const getCountryName = (atlasName) => {
       if (countryNameMap[atlasName]) {
         return countryNameMap[atlasName];
       }
-      // Try to find exact match in data
       const exactMatch = data.find(d => d.Country === atlasName && d.Year === selectedYear);
       return exactMatch ? atlasName : null;
     };
@@ -301,18 +340,12 @@ function Globe({ data, selectedYear, usePersonalized }) {
       </Sphere>
 
       {countryLabels.map((label, index) => (
-        <Text
+        <Label
           key={index}
           position={label.position}
-          fontSize={0.08}
-          color="white"
-          anchorX="center"
-          anchorY="middle"
-          outlineWidth={0.01}
-          outlineColor="#000000"
-        >
-          {label.name}
-        </Text>
+          text={label.name}
+          globeRotation={globeRotation}
+        />
       ))}
     </group>
   );
@@ -375,7 +408,6 @@ const Globe3D = ({ data, selectedYear, usePersonalized = false }) => {
   );
 };
 
-// Stars component for background
 function Stars() {
   const count = 5000;
   const positions = new Float32Array(count * 3);
