@@ -222,82 +222,64 @@ function Globe({ data, selectedYear, usePersonalized }) {
 
     worldData.features.forEach(feature => {
       const countryName = getCountryName(feature.properties.name);
-      if (!countryName) return;
 
       const countryData = data.find(item =>
         item.Country === countryName && item.Year === selectedYear
       );
 
-      if (!countryData) return;
+      const color = countryData ? colorScale(countryData[scoreField]) : '#404040';
 
-      const color = colorScale(countryData[scoreField]);
+      const createPolygonMesh = (coords) => {
+        if (coords.length < 3) return;
+
+        const points = coords.map(([lon, lat]) => {
+          const phi = (90 - lat) * (Math.PI / 180);
+          const theta = (lon + 180) * (Math.PI / 180);
+          const radius = 2.01;
+          return new THREE.Vector3(
+            -radius * Math.sin(phi) * Math.cos(theta),
+            radius * Math.cos(phi),
+            radius * Math.sin(phi) * Math.sin(theta)
+          );
+        });
+
+        const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+        const lineMaterial = new THREE.LineBasicMaterial({
+          color: color,
+          linewidth: 5,
+          transparent: true,
+          opacity: 1.0
+        });
+        const line = new THREE.LineLoop(lineGeometry, lineMaterial);
+        meshes.push(line);
+      };
 
       if (feature.geometry.type === 'Polygon') {
         feature.geometry.coordinates.forEach(coords => {
-          const points = coords.map(([lon, lat]) => {
-            const phi = (90 - lat) * (Math.PI / 180);
-            const theta = (lon + 180) * (Math.PI / 180);
-            const radius = 2.01;
-            return new THREE.Vector3(
-              -radius * Math.sin(phi) * Math.cos(theta),
-              radius * Math.cos(phi),
-              radius * Math.sin(phi) * Math.sin(theta)
-            );
-          });
-
-          if (points.length >= 3) {
-            const geometry = new THREE.BufferGeometry().setFromPoints(points);
-            const material = new THREE.LineBasicMaterial({
-              color: color,
-              linewidth: 2,
-              transparent: true,
-              opacity: 0.8
-            });
-            const line = new THREE.Line(geometry, material);
-            meshes.push(line);
-          }
+          createPolygonMesh(coords);
         });
       } else if (feature.geometry.type === 'MultiPolygon') {
         feature.geometry.coordinates.forEach(polygon => {
           polygon.forEach(coords => {
-            const points = coords.map(([lon, lat]) => {
-              const phi = (90 - lat) * (Math.PI / 180);
-              const theta = (lon + 180) * (Math.PI / 180);
-              const radius = 2.01;
-              return new THREE.Vector3(
-                -radius * Math.sin(phi) * Math.cos(theta),
-                radius * Math.cos(phi),
-                radius * Math.sin(phi) * Math.sin(theta)
-              );
-            });
-
-            if (points.length >= 3) {
-              const geometry = new THREE.BufferGeometry().setFromPoints(points);
-              const material = new THREE.LineBasicMaterial({
-                color: color,
-                linewidth: 2,
-                transparent: true,
-                opacity: 0.8
-              });
-              const line = new THREE.Line(geometry, material);
-              meshes.push(line);
-            }
+            createPolygonMesh(coords);
           });
         });
       }
 
-      const center = countryCenters[countryName];
-      if (center) {
-        const [lon, lat] = center;
-        const phi = (90 - lat) * (Math.PI / 180);
-        const theta = (lon + 180) * (Math.PI / 180);
-        const radius = 2.15;
-        const position = [
-          -radius * Math.sin(phi) * Math.cos(theta),
-          radius * Math.cos(phi),
-          radius * Math.sin(phi) * Math.sin(theta)
-        ];
-        labels.push({ name: countryName, position });
+      if (countryData && countryName) {
+        const center = countryCenters[countryName];
+        if (center) {
+          const [lon, lat] = center;
+          const phi = (90 - lat) * (Math.PI / 180);
+          const theta = (lon + 180) * (Math.PI / 180);
+          const radius = 2.15;
+          const position = [
+            -radius * Math.sin(phi) * Math.cos(theta),
+            radius * Math.cos(phi),
+            radius * Math.sin(phi) * Math.sin(theta)
+          ];
+          labels.push({ name: countryName, position });
+        }
       }
     });
 
@@ -318,23 +300,23 @@ function Globe({ data, selectedYear, usePersonalized }) {
     <group ref={meshRef}>
       <Sphere args={[2, 64, 64]}>
         <meshPhongMaterial
-          color="#1a1a2e"
-          emissive="#0f0f1e"
-          emissiveIntensity={0.2}
-          shininess={30}
+          color="#3d2d4f"
+          emissive="#4a3660"
+          emissiveIntensity={0.3}
+          shininess={50}
         >
           <GradientTexture
             stops={[0, 0.5, 1]}
-            colors={['#1a1a2e', '#16213e', '#0f3460']}
+            colors={['#4a3660', '#3d2d4f', '#2a1f3d']}
           />
         </meshPhongMaterial>
       </Sphere>
 
       <Sphere args={[2.1, 64, 64]}>
         <meshBasicMaterial
-          color="#4fa3d1"
+          color="#8b5fbf"
           transparent
-          opacity={0.1}
+          opacity={0.15}
           side={THREE.BackSide}
         />
       </Sphere>
