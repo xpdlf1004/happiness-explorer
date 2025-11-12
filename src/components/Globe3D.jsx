@@ -36,9 +36,10 @@ function Globe({ data, selectedYear, usePersonalized }) {
     const colorScale = d3.scaleSequential(d3.interpolateYlGnBu)
       .domain([Math.min(...scores), Math.max(...scores)]);
 
+    // Comprehensive country name mapping from World Atlas to CSV data
     const countryNameMap = {
-      'United States of America': 'USA',
-      'United Kingdom': 'UK',
+      'United States of America': 'United States',
+      'United Kingdom': 'United Kingdom',
       'South Africa': 'South Africa',
       'China': 'China',
       'India': 'India',
@@ -52,12 +53,69 @@ function Globe({ data, selectedYear, usePersonalized }) {
       'Mexico': 'Mexico',
       'Russia': 'Russia',
       'Italy': 'Italy',
-      'Spain': 'Spain'
+      'Spain': 'Spain',
+      'Argentina': 'Argentina',
+      'Chile': 'Chile',
+      'Colombia': 'Colombia',
+      'Peru': 'Peru',
+      'Venezuela': 'Venezuela',
+      'Netherlands': 'Netherlands',
+      'Belgium': 'Belgium',
+      'Switzerland': 'Switzerland',
+      'Austria': 'Austria',
+      'Sweden': 'Sweden',
+      'Norway': 'Norway',
+      'Denmark': 'Denmark',
+      'Finland': 'Finland',
+      'Poland': 'Poland',
+      'Czech Republic': 'Czech Republic',
+      'Czechia': 'Czech Republic',
+      'Hungary': 'Hungary',
+      'Romania': 'Romania',
+      'Greece': 'Greece',
+      'Portugal': 'Portugal',
+      'Turkey': 'Turkey',
+      'Egypt': 'Egypt',
+      'Nigeria': 'Nigeria',
+      'Kenya': 'Kenya',
+      'Ethiopia': 'Ethiopia',
+      'Tanzania': 'Tanzania',
+      'Uganda': 'Uganda',
+      'Morocco': 'Morocco',
+      'Algeria': 'Algeria',
+      'Saudi Arabia': 'Saudi Arabia',
+      'United Arab Emirates': 'United Arab Emirates',
+      'Israel': 'Israel',
+      'Jordan': 'Jordan',
+      'Lebanon': 'Lebanon',
+      'Iraq': 'Iraq',
+      'Iran': 'Iran',
+      'Pakistan': 'Pakistan',
+      'Bangladesh': 'Bangladesh',
+      'Thailand': 'Thailand',
+      'Vietnam': 'Vietnam',
+      'Malaysia': 'Malaysia',
+      'Singapore': 'Singapore',
+      'Philippines': 'Philippines',
+      'Indonesia': 'Indonesia',
+      'New Zealand': 'New Zealand',
+      'Ireland': 'Ireland',
+      'Iceland': 'Iceland'
+    };
+
+    // Fallback: try direct name match if not in mapping
+    const getCountryName = (atlasName) => {
+      if (countryNameMap[atlasName]) {
+        return countryNameMap[atlasName];
+      }
+      // Try to find exact match in data
+      const exactMatch = data.find(d => d.Country === atlasName && d.Year === selectedYear);
+      return exactMatch ? atlasName : null;
     };
 
     const countryCenters = {
-      'USA': [-95, 37],
-      'UK': [-3, 54],
+      'United States': [-95, 37],
+      'United Kingdom': [-3, 54],
       'South Africa': [24, -29],
       'China': [104, 35],
       'India': [78, 20],
@@ -71,14 +129,60 @@ function Globe({ data, selectedYear, usePersonalized }) {
       'Mexico': [-102, 23],
       'Russia': [105, 61],
       'Italy': [12, 42],
-      'Spain': [-4, 40]
+      'Spain': [-4, 40],
+      'Argentina': [-63, -38],
+      'Chile': [-71, -30],
+      'Colombia': [-74, 4],
+      'Peru': [-75, -9],
+      'Venezuela': [-66, 6],
+      'Netherlands': [5, 52],
+      'Belgium': [4, 50],
+      'Switzerland': [8, 46],
+      'Austria': [14, 47],
+      'Sweden': [18, 60],
+      'Norway': [8, 60],
+      'Denmark': [9, 56],
+      'Finland': [25, 61],
+      'Poland': [19, 51],
+      'Czech Republic': [15, 49],
+      'Hungary': [19, 47],
+      'Romania': [24, 45],
+      'Greece': [21, 39],
+      'Portugal': [-8, 39],
+      'Turkey': [35, 38],
+      'Egypt': [30, 26],
+      'Nigeria': [8, 9],
+      'Kenya': [37, -0],
+      'Ethiopia': [40, 9],
+      'Tanzania': [34, -6],
+      'Uganda': [32, 1],
+      'Morocco': [-7, 31],
+      'Algeria': [1, 28],
+      'Saudi Arabia': [45, 23],
+      'United Arab Emirates': [53, 23],
+      'Israel': [34, 31],
+      'Jordan': [36, 30],
+      'Lebanon': [35, 33],
+      'Iraq': [43, 33],
+      'Iran': [53, 32],
+      'Pakistan': [69, 30],
+      'Bangladesh': [90, 23],
+      'Thailand': [100, 15],
+      'Vietnam': [108, 14],
+      'Malaysia': [101, 4],
+      'Singapore': [103, 1],
+      'Philippines': [121, 12],
+      'Indonesia': [113, -0],
+      'New Zealand': [174, -40],
+      'Ireland': [-8, 53],
+      'Iceland': [-19, 64]
     };
 
     const labels = [];
     const meshes = [];
 
     worldData.features.forEach(feature => {
-      const countryName = countryNameMap[feature.properties.name];
+      const countryName = getCountryName(feature.properties.name);
       if (!countryName) return;
 
       const countryData = data.find(item =>

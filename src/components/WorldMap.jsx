@@ -35,9 +35,10 @@ const WorldMap = ({ data, selectedYear, onCountryClick, usePersonalized = false 
     const colorScale = d3.scaleSequential(d3.interpolateYlGnBu)
       .domain([Math.min(...scores), Math.max(...scores)]);
 
+    // Comprehensive country name mapping from World Atlas to CSV data
     const countryNameMap = {
-      'United States of America': 'USA',
-      'United Kingdom': 'UK',
+      'United States of America': 'United States',
+      'United Kingdom': 'United Kingdom',
       'South Africa': 'South Africa',
       'China': 'China',
       'India': 'India',
@@ -45,7 +46,70 @@ const WorldMap = ({ data, selectedYear, onCountryClick, usePersonalized = false 
       'France': 'France',
       'Germany': 'Germany',
       'Canada': 'Canada',
-      'Australia': 'Australia'
+      'Australia': 'Australia',
+      'Japan': 'Japan',
+      'South Korea': 'South Korea',
+      'Mexico': 'Mexico',
+      'Russia': 'Russia',
+      'Italy': 'Italy',
+      'Spain': 'Spain',
+      'Argentina': 'Argentina',
+      'Chile': 'Chile',
+      'Colombia': 'Colombia',
+      'Peru': 'Peru',
+      'Venezuela': 'Venezuela',
+      'Netherlands': 'Netherlands',
+      'Belgium': 'Belgium',
+      'Switzerland': 'Switzerland',
+      'Austria': 'Austria',
+      'Sweden': 'Sweden',
+      'Norway': 'Norway',
+      'Denmark': 'Denmark',
+      'Finland': 'Finland',
+      'Poland': 'Poland',
+      'Czech Republic': 'Czech Republic',
+      'Czechia': 'Czech Republic',
+      'Hungary': 'Hungary',
+      'Romania': 'Romania',
+      'Greece': 'Greece',
+      'Portugal': 'Portugal',
+      'Turkey': 'Turkey',
+      'Egypt': 'Egypt',
+      'Nigeria': 'Nigeria',
+      'Kenya': 'Kenya',
+      'Ethiopia': 'Ethiopia',
+      'Tanzania': 'Tanzania',
+      'Uganda': 'Uganda',
+      'Morocco': 'Morocco',
+      'Algeria': 'Algeria',
+      'Saudi Arabia': 'Saudi Arabia',
+      'United Arab Emirates': 'United Arab Emirates',
+      'Israel': 'Israel',
+      'Jordan': 'Jordan',
+      'Lebanon': 'Lebanon',
+      'Iraq': 'Iraq',
+      'Iran': 'Iran',
+      'Pakistan': 'Pakistan',
+      'Bangladesh': 'Bangladesh',
+      'Thailand': 'Thailand',
+      'Vietnam': 'Vietnam',
+      'Malaysia': 'Malaysia',
+      'Singapore': 'Singapore',
+      'Philippines': 'Philippines',
+      'Indonesia': 'Indonesia',
+      'New Zealand': 'New Zealand',
+      'Ireland': 'Ireland',
+      'Iceland': 'Iceland'
+    };
+
+    // Fallback: try direct name match if not in mapping
+    const getCountryName = (atlasName) => {
+      if (countryNameMap[atlasName]) {
+        return countryNameMap[atlasName];
+      }
+      // Try to find exact match in data
+      const exactMatch = data.find(d => d.Country === atlasName && d.Year === selectedYear);
+      return exactMatch ? atlasName : null;
     };
 
     const g = svg.append('g');
@@ -55,7 +119,7 @@ const WorldMap = ({ data, selectedYear, onCountryClick, usePersonalized = false 
       .join('path')
       .attr('d', pathGenerator)
       .attr('fill', d => {
-        const countryName = countryNameMap[d.properties.name];
+        const countryName = getCountryName(d.properties.name);
         if (!countryName) return '#e0e0e0';
 
         const countryData = data.find(item =>
@@ -69,7 +133,7 @@ const WorldMap = ({ data, selectedYear, onCountryClick, usePersonalized = false 
       .style('cursor', 'pointer')
       .style('transition', 'fill 0.5s ease')
       .on('mouseover', (event, d) => {
-        const countryName = countryNameMap[d.properties.name];
+        const countryName = getCountryName(d.properties.name);
         if (!countryName) return;
 
         const countryData = data.find(item =>
@@ -96,7 +160,7 @@ const WorldMap = ({ data, selectedYear, onCountryClick, usePersonalized = false 
           .attr('stroke-width', 0.5);
       })
       .on('click', (_, d) => {
-        const countryName = countryNameMap[d.properties.name];
+        const countryName = getCountryName(d.properties.name);
         if (countryName) {
           onCountryClick(countryName);
         }

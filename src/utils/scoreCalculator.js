@@ -80,13 +80,23 @@ export const PRESETS = {
 
 // Normalize values to 0-1 range for each factor
 export function normalizeData(data, factor) {
-  const values = data.map(d => d[factor]).filter(v => !isNaN(v));
+  const values = data.map(d => d[factor]).filter(v => v !== undefined && !isNaN(v));
+
+  if (values.length === 0) {
+    return data.map(d => ({
+      ...d,
+      [`${factor}_normalized`]: 0
+    }));
+  }
+
   const min = Math.min(...values);
   const max = Math.max(...values);
 
   return data.map(d => ({
     ...d,
-    [`${factor}_normalized`]: max === min ? 0 : (d[factor] - min) / (max - min)
+    [`${factor}_normalized`]: (d[factor] !== undefined && !isNaN(d[factor]))
+      ? (max === min ? 0 : (d[factor] - min) / (max - min))
+      : 0
   }));
 }
 
@@ -109,6 +119,8 @@ export function calculatePersonalizedScore(dataPoint, weights) {
 
 // Process all data with personalized scores
 export function processDataWithWeights(data, weights) {
+  if (data.length === 0) return data;
+
   // First normalize all factors
   let processedData = [...data];
   FACTORS.forEach(factor => {
