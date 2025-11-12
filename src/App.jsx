@@ -155,82 +155,83 @@ function App() {
             padding: '12px',
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
             display: 'flex',
-            gap: '6px',
-            flexWrap: 'wrap'
+            flexDirection: 'column',
+            gap: '8px'
           }}
         >
+          {/* Region button - full width top row */}
           <button
             onClick={() => setActiveView('region')}
             style={{
-              flex: 1,
-              minWidth: '80px',
-              padding: '8px 12px',
+              width: '100%',
+              padding: '10px 12px',
               border: 'none',
               borderRadius: '6px',
               background: activeView === 'region' ? '#2196f3' : '#f0f0f0',
               color: activeView === 'region' ? 'white' : '#666',
               cursor: 'pointer',
-              fontSize: '12px',
-              fontWeight: '500',
+              fontSize: '13px',
+              fontWeight: '600',
               transition: 'all 0.2s'
             }}
           >
             🗺️ Region
           </button>
-          <button
-            onClick={() => setActiveView('scatter')}
-            style={{
-              flex: 1,
-              minWidth: '80px',
-              padding: '8px 12px',
-              border: 'none',
-              borderRadius: '6px',
-              background: activeView === 'scatter' ? '#2196f3' : '#f0f0f0',
-              color: activeView === 'scatter' ? 'white' : '#666',
-              cursor: 'pointer',
-              fontSize: '12px',
-              fontWeight: '500',
-              transition: 'all 0.2s'
-            }}
-          >
-            📊 Scatter
-          </button>
-          <button
-            onClick={() => setActiveView('trends')}
-            style={{
-              flex: 1,
-              minWidth: '80px',
-              padding: '8px 12px',
-              border: 'none',
-              borderRadius: '6px',
-              background: activeView === 'trends' ? '#2196f3' : '#f0f0f0',
-              color: activeView === 'trends' ? 'white' : '#666',
-              cursor: 'pointer',
-              fontSize: '12px',
-              fontWeight: '500',
-              transition: 'all 0.2s'
-            }}
-          >
-            📈 Trends
-          </button>
-          <button
-            onClick={() => setActiveView('distribution')}
-            style={{
-              flex: 1,
-              minWidth: '80px',
-              padding: '8px 12px',
-              border: 'none',
-              borderRadius: '6px',
-              background: activeView === 'distribution' ? '#2196f3' : '#f0f0f0',
-              color: activeView === 'distribution' ? 'white' : '#666',
-              cursor: 'pointer',
-              fontSize: '12px',
-              fontWeight: '500',
-              transition: 'all 0.2s'
-            }}
-          >
-            📊 Distribution
-          </button>
+
+          {/* Other three buttons - bottom row */}
+          <div style={{ display: 'flex', gap: '6px' }}>
+            <button
+              onClick={() => setActiveView('scatter')}
+              style={{
+                flex: 1,
+                padding: '8px 12px',
+                border: 'none',
+                borderRadius: '6px',
+                background: activeView === 'scatter' ? '#2196f3' : '#f0f0f0',
+                color: activeView === 'scatter' ? 'white' : '#666',
+                cursor: 'pointer',
+                fontSize: '12px',
+                fontWeight: '500',
+                transition: 'all 0.2s'
+              }}
+            >
+              📊 Scatter
+            </button>
+            <button
+              onClick={() => setActiveView('trends')}
+              style={{
+                flex: 1,
+                padding: '8px 12px',
+                border: 'none',
+                borderRadius: '6px',
+                background: activeView === 'trends' ? '#2196f3' : '#f0f0f0',
+                color: activeView === 'trends' ? 'white' : '#666',
+                cursor: 'pointer',
+                fontSize: '12px',
+                fontWeight: '500',
+                transition: 'all 0.2s'
+              }}
+            >
+              📈 Trends
+            </button>
+            <button
+              onClick={() => setActiveView('distribution')}
+              style={{
+                flex: 1,
+                padding: '8px 12px',
+                border: 'none',
+                borderRadius: '6px',
+                background: activeView === 'distribution' ? '#2196f3' : '#f0f0f0',
+                color: activeView === 'distribution' ? 'white' : '#666',
+                cursor: 'pointer',
+                fontSize: '12px',
+                fontWeight: '500',
+                transition: 'all 0.2s'
+              }}
+            >
+              📊 Distribution
+            </button>
+          </div>
         </motion.div>
 
         {/* Main View - Center */}
