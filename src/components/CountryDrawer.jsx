@@ -157,7 +157,7 @@ const CountryDrawer = ({ country, data, selectedYear, isOpen, onClose, usePerson
               marginBottom: '16px',
               fontWeight: '600'
             }}>
-              Score History (2005-2024)
+              Score History (2015-2023)
             </h3>
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={lineChartData}>

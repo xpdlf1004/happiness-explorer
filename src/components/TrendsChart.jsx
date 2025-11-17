@@ -93,7 +93,7 @@ const TrendsChart = ({ data, selectedYear, onCountryClick, usePersonalized }) =>
           fontSize: '20px',
           fontWeight: 'bold'
         }}>
-          Happiness Trends Over Time (2005-2024)
+          Happiness Trends Over Time (2015-2023)
         </h2>
         <p style={{
           margin: 0,

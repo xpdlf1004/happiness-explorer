@@ -105,7 +105,7 @@ function App() {
           fontSize: '14px',
           opacity: 0.9
         }}>
-          Redefine happiness based on your personal values • World Happiness Report 2005-2024
+          Redefine happiness based on your personal values • World Happiness Report 2015-2023
         </p>
       </motion.header>
 
